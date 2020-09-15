@@ -21,9 +21,12 @@ class Matrix(object):
     def __mul__(self,p2):
         if type(p2) is int:
             out = Matrix(self.size()[0], self.size()[1])
-            
+            for x in range(out.size()[0]):
+                for y in range(out.size()[1]):
+                    out.set(x,y, self.get(x,y) * p2)
+            return out
         elif type(p2) is Matrix:
-            pass
+            pass#TODO: Make here
         else:
             raise Exception("Cant multiply")
             return None
