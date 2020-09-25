@@ -26,7 +26,16 @@ class Matrix(object):
                     out.set(x,y, self.get(x,y) * p2)
             return out
         elif type(p2) is Matrix:
-            pass#TODO: Make here
+            if self.size()[0] != p2.size()[1]:
+                raise Exception("Matrix not in right format")
+                return None
+            return self.mulM(p2)
         else:
             raise Exception("Cant multiply")
             return None
+
+    def mulM(self, p2):
+        product = Matrix(self.size()[0], p2.size()[1])
+
+        for row in range():
+            pass

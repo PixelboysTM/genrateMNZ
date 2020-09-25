@@ -1,10 +1,40 @@
 from PIL import Image, ImageFilter
 from threading import Thread
 import time
-from samplingInRGBpure import GetRGBpure
+import numpy as np
 
 # █
 # Methods
+def GetRGBpure(color):
+    if color[0] > color[1] and color[0] > color[2]:
+        return (255,0,0)
+    if color[1] > color[0] and color[1] > color[2]:
+        return (0,255,0)
+    if color[2] > color[0] and color[2] > color[1]:
+        return (0,0,255)
+    if color[0] == color[1] == color[2]:
+        if color[0] <= 127:
+            return (0,0,0)
+        else:
+            return (255,255,255)
+
+    if color[0] == color[1]:
+        if color[0] > color[2]:
+            return (255,0,0)
+        else:
+            return (0,0,255)
+    if color[0] == color[2]:
+        if color[0] > color[1]:
+            return (255,0,0)
+        else:
+            return (0,255,0)
+    if color[1] == color[2]:
+        if color[1] > color[0]:
+            return (0,255,0)
+        else:
+            return (255,0,0)
+    input("Falsche Farbe " + str(color) ) 
+
 def GetColors(x, xto):
     for xw in range(x, xto):
         for y in range(originalImage.size[1]):
@@ -67,6 +97,39 @@ def GetPixelAtPos(image,x,y):
     else:
         return None
 
+def PerformX(x,y, image):
+    a = np.mat(np.array([[-1,0,1],[-2,0,2],[-1,0,1]]))
+    p00 = image.getpixel((x - 1,y - 1))
+    p01 = image.getpixel((x - 1,y    ))
+    p02 = image.getpixel((x - 1,y + 1))
+
+    p00 = image.getpixel((x    ,y - 1))
+    p01 = image.getpixel((x    ,y    ))
+    p02 = image.getpixel((x    ,y + 1))
+
+    p00 = image.getpixel((x + 1,y - 1))
+    p01 = image.getpixel((x + 1,y    ))
+    p02 = image.getpixel((x + 1,y + 1))
+
+
+    b = np.mat(np.array([
+        [p[0]],
+        [p[1]],
+        [p[2]]
+    ]))
+    r = a * b
+    return (r.item((0,0)), r.item((1,0)), r.item((2,0)))
+
+def PerformY(x,y, image):
+    a = np.mat(np.array([[-1,-2,-1],[0,0,0],[1,2,1]]))
+    p = image.getpixel((x,y))
+    b = np.mat(np.array([[p[0]],[p[1]],[p[2]]]))
+    r = a * b
+    return (r.item((0,0)), r.item((1,0)), r.item((2,0)))
+
+def PerformPythagoras(x,y,a,b):
+    ca = a.getpixel((x,y))
+    cb = b.getpixel((x,y))
 # ENd methods
 imageName = input("Image to be processed: ")
 print("Analysing...")
@@ -154,15 +217,5 @@ else:
 
 print("-------------------------------------------------")
 print("Noise reduction:")
-reducedIamge = newImage
-# for x in range(1, newImage.size[0]):
-#     for y in range(1,newImage.size[1]):
-#         pixelGrid = [
-#             [GetPixelAtPos(newImage,x-1,y-1),GetPixelAtPos(newImage,x-1,y),GetPixelAtPos(newImage,x-1,y+1)],
-#             [GetPixelAtPos(newImage,x,y-1),GetPixelAtPos(newImage,x,y),GetPixelAtPos(newImage,x,y+1)],
-#             [GetPixelAtPos(newImage,x+1,y-1),GetPixelAtPos(newImage,x+1,y),GetPixelAtPos(newImage,x+1,y+1)]
-#         ]
-
-i1 = reducedIamge.filter(ImageFilter.CONTOUR)
-i1.show()
-
+grayA = newImage.filter(ImageFilter.FIND_EDGES)
+grayA.show()
